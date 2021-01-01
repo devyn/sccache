@@ -1899,7 +1899,7 @@ struct RustToolchainPackager {
 }
 
 #[cfg(feature = "dist-client")]
-#[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+#[cfg(all(target_os = "linux", target_arch = "aarch64"))]
 impl pkg::ToolchainPackager for RustToolchainPackager {
     fn write_pkg(self: Box<Self>, f: fs::File) -> Result<()> {
         info!(
@@ -2002,18 +2002,18 @@ fn test_rust_outputs_rewriter() {
     assert!(mappings.len() == 1);
     let linux_prefix = &mappings[0].1;
 
-    let depinfo_data = format!("{prefix}/sccache/target/x86_64-unknown-linux-gnu/debug/deps/sccache_dist-c6f3229b9ef0a5c3.rmeta: src/bin/sccache-dist/main.rs src/bin/sccache-dist/build.rs src/bin/sccache-dist/token_check.rs
+    let depinfo_data = format!("{prefix}/sccache/target/aarch64-unknown-linux-gnu/debug/deps/sccache_dist-c6f3229b9ef0a5c3.rmeta: src/bin/sccache-dist/main.rs src/bin/sccache-dist/build.rs src/bin/sccache-dist/token_check.rs
 
-{prefix}/sccache/target/x86_64-unknown-linux-gnu/debug/deps/sccache_dist-c6f3229b9ef0a5c3.d: src/bin/sccache-dist/main.rs src/bin/sccache-dist/build.rs src/bin/sccache-dist/token_check.rs
+{prefix}/sccache/target/aarch64-unknown-linux-gnu/debug/deps/sccache_dist-c6f3229b9ef0a5c3.d: src/bin/sccache-dist/main.rs src/bin/sccache-dist/build.rs src/bin/sccache-dist/token_check.rs
 
 src/bin/sccache-dist/main.rs:
 src/bin/sccache-dist/build.rs:
 src/bin/sccache-dist/token_check.rs:
 ", prefix=linux_prefix);
 
-    let depinfo_resulting_data = format!("{prefix}/sccache/target/x86_64-unknown-linux-gnu/debug/deps/sccache_dist-c6f3229b9ef0a5c3.rmeta: src/bin/sccache-dist/main.rs src/bin/sccache-dist/build.rs src/bin/sccache-dist/token_check.rs
+    let depinfo_resulting_data = format!("{prefix}/sccache/target/aarch64-unknown-linux-gnu/debug/deps/sccache_dist-c6f3229b9ef0a5c3.rmeta: src/bin/sccache-dist/main.rs src/bin/sccache-dist/build.rs src/bin/sccache-dist/token_check.rs
 
-{prefix}/sccache/target/x86_64-unknown-linux-gnu/debug/deps/sccache_dist-c6f3229b9ef0a5c3.d: src/bin/sccache-dist/main.rs src/bin/sccache-dist/build.rs src/bin/sccache-dist/token_check.rs
+{prefix}/sccache/target/aarch64-unknown-linux-gnu/debug/deps/sccache_dist-c6f3229b9ef0a5c3.d: src/bin/sccache-dist/main.rs src/bin/sccache-dist/build.rs src/bin/sccache-dist/token_check.rs
 
 src/bin/sccache-dist/main.rs:
 src/bin/sccache-dist/build.rs:

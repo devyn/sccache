@@ -35,7 +35,7 @@ pub trait OutputsRepackager {
         -> Result<dist::PathTransformer>;
 }
 
-#[cfg(not(all(target_os = "linux", target_arch = "x86_64")))]
+#[cfg(not(all(target_os = "linux", target_arch = "aarch64")))]
 mod toolchain_imp {
     use super::ToolchainPackager;
     use std::fs;
@@ -51,7 +51,7 @@ mod toolchain_imp {
     }
 }
 
-#[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+#[cfg(all(target_os = "linux", target_arch = "aarch64"))]
 mod toolchain_imp {
     use super::tarify_path;
     use std::collections::BTreeMap;
@@ -182,12 +182,12 @@ mod toolchain_imp {
     // This function will extract any absolute paths from output like the following:
     // $ ldd /bin/ls
     //         linux-vdso.so.1 =>  (0x00007ffeb41f6000)
-    //         libselinux.so.1 => /lib/x86_64-linux-gnu/libselinux.so.1 (0x00007f6877f4f000)
-    //         libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f6877b85000)
-    //         libpcre.so.3 => /lib/x86_64-linux-gnu/libpcre.so.3 (0x00007f6877915000)
-    //         libdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f6877711000)
+    //         libselinux.so.1 => /lib/aarch64-linux-gnu/libselinux.so.1 (0x00007f6877f4f000)
+    //         libc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x00007f6877b85000)
+    //         libpcre.so.3 => /lib/aarch64-linux-gnu/libpcre.so.3 (0x00007f6877915000)
+    //         libdl.so.2 => /lib/aarch64-linux-gnu/libdl.so.2 (0x00007f6877711000)
     //         /lib64/ld-linux-x86-64.so.2 (0x00007f6878171000)
-    //         libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f68774f4000)
+    //         libpthread.so.0 => /lib/aarch64-linux-gnu/libpthread.so.0 (0x00007f68774f4000)
     //
     // Elf executables can be statically or dynamically linked, and position independant (PIE) or not:
     // - dynamic + PIE = ET_DYN, ldd stdouts something like the list above and exits with code 0
@@ -262,7 +262,7 @@ mod toolchain_imp {
             let libpath = match (parts.get(0), parts.get(1), parts.get(2)) {
                 // "linux-vdso.so.1 =>  (0x00007ffeb41f6000)"
                 (Some(_libname), Some(&"=>"), None) => continue,
-                // "libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f6877b85000)"
+                // "libc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x00007f6877b85000)"
                 (Some(libname), Some(&"=>"), Some(libpath)) => {
                     // ldd (version 2.30) will output something like this:
                     //   ...
@@ -297,12 +297,12 @@ mod toolchain_imp {
     #[test]
     fn test_ldd_parse() {
         let ubuntu_ls_output = "\tlinux-vdso.so.1 =>  (0x00007fffcfffe000)
-\tlibselinux.so.1 => /lib/x86_64-linux-gnu/libselinux.so.1 (0x00007f69caa6b000)
-\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f69ca6a1000)
-\tlibpcre.so.3 => /lib/x86_64-linux-gnu/libpcre.so.3 (0x00007f69ca431000)
-\tlibdl.so.2 => /lib/x86_64-linux-gnu/libdl.so.2 (0x00007f69ca22d000)
+\tlibselinux.so.1 => /lib/aarch64-linux-gnu/libselinux.so.1 (0x00007f69caa6b000)
+\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x00007f69ca6a1000)
+\tlibpcre.so.3 => /lib/aarch64-linux-gnu/libpcre.so.3 (0x00007f69ca431000)
+\tlibdl.so.2 => /lib/aarch64-linux-gnu/libdl.so.2 (0x00007f69ca22d000)
 \t/lib64/ld-linux-x86-64.so.2 (0x00007f69cac8d000)
-\tlibpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f69ca010000)
+\tlibpthread.so.0 => /lib/aarch64-linux-gnu/libpthread.so.0 (0x00007f69ca010000)
 ";
         assert_eq!(
             parse_ldd_output(ubuntu_ls_output)
@@ -310,12 +310,12 @@ mod toolchain_imp {
                 .map(|p| p.to_str().unwrap())
                 .collect::<Vec<_>>(),
             &[
-                "/lib/x86_64-linux-gnu/libselinux.so.1",
-                "/lib/x86_64-linux-gnu/libc.so.6",
-                "/lib/x86_64-linux-gnu/libpcre.so.3",
-                "/lib/x86_64-linux-gnu/libdl.so.2",
+                "/lib/aarch64-linux-gnu/libselinux.so.1",
+                "/lib/aarch64-linux-gnu/libc.so.6",
+                "/lib/aarch64-linux-gnu/libpcre.so.3",
+                "/lib/aarch64-linux-gnu/libdl.so.2",
                 "/lib64/ld-linux-x86-64.so.2",
-                "/lib/x86_64-linux-gnu/libpthread.so.0",
+                "/lib/aarch64-linux-gnu/libpthread.so.0",
             ]
         )
     }
@@ -335,7 +335,7 @@ mod toolchain_imp {
     fn test_ldd_parse_v2_30() {
         let archlinux_ls_output = "\tlinux-vdso.so.1 (0x00007ffddc1f6000)
 \tlibcap.so.2 => /usr/lib/libcap.so.2 (0x00007f4980989000)
-\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f69ca6a1000)
+\tlibc.so.6 => /lib/aarch64-linux-gnu/libc.so.6 (0x00007f69ca6a1000)
 \tlibc.so.6 => /usr/lib/libc.so.6 (0x00007f49807c2000)
 \t/lib64/ld-linux-x86-64.so.2 => /usr/lib64/ld-linux-x86-64.so.2 (0x00007f49809e9000)
 ";
@@ -346,7 +346,7 @@ mod toolchain_imp {
                 .collect::<Vec<_>>(),
             &[
                 "/usr/lib/libcap.so.2",
-                "/lib/x86_64-linux-gnu/libc.so.6",
+                "/lib/aarch64-linux-gnu/libc.so.6",
                 "/usr/lib/libc.so.6",
                 "/lib64/ld-linux-x86-64.so.2",
                 "/usr/lib64/ld-linux-x86-64.so.2",
@@ -395,7 +395,7 @@ pub fn make_tar_header(src: &Path, dest: &str) -> io::Result<tar::Header> {
 }
 
 /// Simplify the path and strip the leading slash
-#[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+#[cfg(all(target_os = "linux", target_arch = "aarch64"))]
 fn tarify_path(path: &Path) -> Result<PathBuf> {
     let final_path = simplify_path(path)?;
     let mut components = final_path.components();
